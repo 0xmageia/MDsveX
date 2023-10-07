@@ -87,7 +87,7 @@ export function transform(
 		);
 	}
 
-	apply_plugins(remarkPlugins, toMDAST).use(highlight_blocks, highlight || {});
+	apply_plugins(remarkPlugins, toMDAST);
 
 	const toHAST = toMDAST
 		.use(remark2rehype, {
@@ -155,10 +155,12 @@ function process_layouts(layouts: Layout) {
 		try {
 			ast = parse(layout);
 		} catch (e) {
-			throw new Error(e.toString() + `\n	at ${_layouts[key].path}`);
+			if (e instanceof Error) {
+				throw new Error(e.toString() + `\n	at ${_layouts[key].path}`);
+			}
 		}
 
-		if (ast.module) {
+		if (ast?.module) {
 			const component_exports = ast.module.content.body.filter(
 				(node) => node.type === 'ExportNamedDeclaration'
 			) as ExportNamedDeclaration[];
